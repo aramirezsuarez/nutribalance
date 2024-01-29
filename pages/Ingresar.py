@@ -152,78 +152,80 @@ def actualizar_datos_usuario(username, new_username, new_password):
     return False
 
 # Manejo de posibles errores
-try:
-    # Se almacenan los datos necesarios de la DB
-    users = fetch_usuarios()
-    emails = get_emails_usuarios()
-    usernames = get_usernames_usuarios()
-    passwords = [user["password"] for user in users]
 
-    # Se crea el diccionario credentials necesario para el
-    # funcionamiento del autenticador de cuentas
-    credentials = {"usernames" : {}}
-    for index in range(len(emails)):
-        credentials["usernames"][usernames[index]] = {"name" : emails[index],
+# Se almacenan los datos necesarios de la DB
+users = fetch_usuarios()
+emails = get_emails_usuarios()
+usernames = get_usernames_usuarios()
+passwords = [user["password"] for user in users]
+
+# Se crea el diccionario credentials necesario para el
+# funcionamiento del autenticador de cuentas
+credentials = {"usernames" : {}}
+for index in range(len(emails)):
+  
+  credentials["usernames"][usernames[index]] = {"name" : emails[index],
                                                 "password" : passwords[index]}
 
-    # Creacion del autenticador
-    Authenticator = stauth.Authenticate(credentials, cookie_name="Streamlit",
+# Creacion del autenticador
+Authenticator = stauth.Authenticate(credentials, cookie_name="Streamlit",
                                         key="cookiekey", cookie_expiry_days=3)
 
-    # La funcion login regresa una tupla con estos
-    # 3 valores los cuales atrapamos
-    email, authentication_status, username = Authenticator.login("Ingresar",
+# La funcion login regresa una tupla con estos
+# 3 valores los cuales atrapamos
+email, authentication_status, username = Authenticator.login("Ingresar",
                                                                     "main")
 
-    # Comprobacion de la existencia del username dentro de la DB
-    # y mensajes de advertencia en caso de un mal inicio de sesion
-    if username:
-        if username in usernames:
-            if authentication_status:
-                st.write(f"Bienvenido {username}")
-                # Creacion de boton de cerrar sesion en la barra lateral
-                Authenticator.logout("Cerrar sesion", location="sidebar")
+# Comprobacion de la existencia del username dentro de la DB
+# y mensajes de advertencia en caso de un mal inicio de sesion
+if username:
+    if username in usernames:
+        if authentication_status:
+            st.write(f"Bienvenido {username}")
+            
+            # Creacion de boton de cerrar sesion en la barra lateral
+            Authenticator.logout("Cerrar sesion", location="sidebar")
 
-                # Creacion de seccion de administracion de cuenta donde
-                # el usuario puede actualizar sus datos si lo desea
-                st.subheader("Actualizar Datos")
+            # Creacion de seccion de administracion de cuenta donde
+            # el usuario puede actualizar sus datos si lo desea
+            st.subheader("Actualizar Datos")
 
-                # Obtener el nombre de usuario del usuario autenticado
-                username = st.session_state["username"]
+            # Obtener el nombre de usuario del usuario autenticado
+            username = st.session_state["username"]
 
-                # Crear formulario
-                with st.form(key="actualizar_datos"):
-                    # Campos para ingresar nueva contraseña y nombre de usuario
-                    new_password = st.text_input("Nueva Contraseña", type="password")
-                    new_username = st.text_input("Nuevo Nombre de Usuario")
+            # Crear formulario
+            with st.form(key="actualizar_datos"):
+                # Campos para ingresar nueva contraseña y nombre de usuario
+                new_password = st.text_input("Nueva Contraseña", type="password")
+                new_username = st.text_input("Nuevo Nombre de Usuario")
 
-                    # Botón para enviar el formulario
-                    st.form_submit_button("Actualizar Datos")
-                st.warning("Tenga en cuenta que al actualizar sus datos debe iniciar"
-                        " sesion nuevamente")
+                # Botón para enviar el formulario
+                st.form_submit_button("Actualizar Datos")
+            
+            st.warning("Tenga en cuenta que al actualizar sus datos debe iniciar"
+                    " sesion nuevamente")
 
-                # Procesar la actualización si se proporcionaron nuevos datos
-                if new_password or new_username:
-                    success = actualizar_datos_usuario(username, new_username,
-                                                    new_password)
-                    if success:
-                        st.success("Datos actualizados con éxito.")
-                        Authenticator.cookie_manager.delete(Authenticator.cookie_name)
-                        st.session_state['logout'] = True
-                        st.session_state['name'] = None
-                        st.session_state['username'] = None
-                        st.session_state['authentication_status'] = None
-                    else:
-                        st.warning("Error al actualizar datos. Inténtelo de nuevo.")
+            # Procesar la actualización si se proporcionaron nuevos datos
+            if new_password or new_username:
+                success = actualizar_datos_usuario(username, new_username, new_password)
+                if success:
+                    st.success("Datos actualizados con éxito.")
+                    Authenticator.cookie_manager.delete(Authenticator.cookie_name)
+                    st.session_state['logout'] = True
+                    st.session_state['name'] = None
+                    st.session_state['username'] = None
+                    st.session_state['authentication_status'] = None
+                else:
+                    st.warning("Error al actualizar datos. Inténtelo de nuevo.")
 
-            elif not authentication_status:
-                st.warning("Contraseña o nombre de usuario incorrectos")
-            else:
-                st.warning("Por favor ingrese todos los campos")
+        elif not authentication_status:
+            st.warning("Contraseña o nombre de usuario incorrectos")
         else:
-            st.warning("Nombre de usuario no existe, por favor registrese")
-except:
-    st.error("Excepcion lanzada")
+            st.warning("Por favor ingrese todos los campos")
+    else:
+        st.warning("Nombre de usuario no existe, por favor regístrese")
+
+
 
 # Crear pie de pagina con los datos de contacto de los creadores
 footer = """
