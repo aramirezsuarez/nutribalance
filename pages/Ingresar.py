@@ -184,8 +184,6 @@ try:
                 st.warning("Por favor ingrese todos los campos")
         else:
             st.warning("Nombre de usuario no existe, por favor registrese")
-except:
-    st.error("Excepcion lanzada")
 
 # Crear pie de pagina con los datos de contacto de los creadores
 footer = """
