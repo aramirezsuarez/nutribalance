@@ -8,7 +8,7 @@ import re
 from deta import Deta
 
 # Almacenamos la key de la base de datos en una constante
-DETA_KEY = "e0qgr2zg4tq_mbZWcCg7iGCpWFBbCy3GGFjEYHdFmZYR"
+DETA_KEY = "AXnEY5Eh_oygJSvkjrvwFsaEekozC7a8NeXpcAiAQ"
 
 # Creamos nuestro objeto deta para hacer la conexion a la DB
 deta = Deta(DETA_KEY)
