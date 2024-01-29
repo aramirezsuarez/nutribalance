@@ -126,30 +126,6 @@ def validar_username(username):
         return True
     return False
 
-# Función para actualizar la contraseña y/o el nombre de usuario
-def actualizar_datos_usuario(username, new_username, new_password):
-    """
-    Actualiza la contraseña y/o el nombre de usuario de un usuario registrado.
-
-    Parameters:
-    - username (str): Nombre de usuario actual del usuario.
-    - new_username (str): Nuevo nombre de usuario (puede ser el mismo).
-    - new_password (str): Nueva contraseña (puede ser la misma).
-
-    Returns:
-    - bool: True si la actualización fue exitosa, False si hubo un error.
-    """
-    users = db.fetch()
-    for user in users.items:
-        if user["username"] == username:
-            if new_username:
-                user["username"] = new_username
-            if new_password:
-                new_encrypted_password = stauth.Hasher([new_password]).generate()
-                user["password"] = new_encrypted_password[0]
-            db.put(user)
-            return True
-    return False
 
 # Manejo de posibles errores
 try:
