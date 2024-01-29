@@ -207,4 +207,3 @@ footer = """
     Contactenos: <a href="#">lulopeze@unal.edu.co</a> | <a href="#">aramirezsu@unal.edu.co</a></p>
 </div>
 """
-st.markdown(footer,unsafe_allow_html=True)
