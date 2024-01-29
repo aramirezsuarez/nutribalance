@@ -37,16 +37,16 @@ def insertar_usuario(email, username, age, height, password):
 # Funcion que retorna los usuarios registrados
 def fetch_usuarios():
     """
-   Recupera y devuelve un diccionario con los usuarios
-   registrados en la Base de Datos.
+    Recupera y devuelve un diccionario con los usuarios
+    registrados en la Base de Datos.
 
-   Returns:
-   - dict: Un diccionario que contiene la información de los
-   usuarios registrados.
-   Cada clave es la dirección de correo electrónico única del usuario,
-   y cada valor es un diccionario con detalles como
-   "username", "age", "height", y "password".
-   """
+    Returns:
+    - dict: Un diccionario que contiene la información de los
+    usuarios registrados.
+    Cada clave es la dirección de correo electrónico única del usuario,
+    y cada valor es un diccionario con detalles como
+    "username", "age", "height", y "password".
+    """
     # guardamos los datos de la DB en users y retornamos su contenido
     users = db.fetch()
     return users.items
@@ -90,14 +90,14 @@ def get_usernames_usuarios():
 # Funcion que verifica si un email ingresado es valido
 def validar_email(email):
     """
-   Retorna True si el email ingresado es válido, de lo contrario retorna False
+    Retorna True si el email ingresado es válido, de lo contrario retorna False
 
-   Parameters:
-   - email (str): Dirección de correo electrónico a validar.
+    Parameters:
+    - email (str): Dirección de correo electrónico a validar.
 
-   Returns:
-   - bool: True si el email es válido, False si no lo es.
-   """
+    Returns:
+    - bool: True si el email es válido, False si no lo es.
+    """
     # Patrones tipicos de un email valido
     pattern = "^[a-zA-Z0_9-_]+@[a-zA-Z0_9-_]+\.[a-z]{1,3}$"
     pattern1 = "^[a-zA-Z0_9-_]+@[a-zA-Z0_9-_]+\.[a-z]{1,3}+\.[a-z]{1,3}$"
@@ -125,7 +125,6 @@ def validar_username(username):
     if re.match(pattern, username):
         return True
     return False
-
 
 # Manejo de posibles errores
 try:
@@ -184,4 +183,3 @@ try:
                 st.warning("Por favor ingrese todos los campos")
         else:
             st.warning("Nombre de usuario no existe, por favor registrese")
-
