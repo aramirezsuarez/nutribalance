@@ -177,21 +177,7 @@ try:
                     st.form_submit_button("Actualizar Datos")
                 st.warning("Tenga en cuenta que al actualizar sus datos debe iniciar"
                         " sesion nuevamente")
-
-                # Procesar la actualización si se proporcionaron nuevos datos
-                if new_password or new_username:
-                    success = actualizar_datos_usuario(username, new_username,
-                                                    new_password)
-                    if success:
-                        st.success("Datos actualizados con éxito.")
-                        Authenticator.cookie_manager.delete(Authenticator.cookie_name)
-                        st.session_state['logout'] = True
-                        st.session_state['name'] = None
-                        st.session_state['username'] = None
-                        st.session_state['authentication_status'] = None
-                    else:
-                        st.warning("Error al actualizar datos. Inténtelo de nuevo.")
-
+                
             elif not authentication_status:
                 st.warning("Contraseña o nombre de usuario incorrectos")
             else:
