@@ -15,7 +15,8 @@ db = deta.Base("NutribalanceUsers")
 # Tu función fetch_usuarios
 def fetch_usuarios():
     users = db.fetch()
-    return users.items
+    user_dict = {user['username']: user for user in users.items}
+    return user_dict
 
 def get_usernames_usuarios():
     """
