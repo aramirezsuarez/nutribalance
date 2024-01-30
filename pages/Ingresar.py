@@ -58,47 +58,36 @@ def get_emails_usuarios():
     emails = list(users.keys())
     return emails
 
+# Tu función principal
 def main():
     st.title("Inicio de Sesión")
 
-    # Recuperar el estado de inicio de sesión desde la sesión
-    session_state = st.session_state
-    if not hasattr(session_state, "logged_in"):
-        session_state.logged_in = False
+    # Formulario de inicio de sesión
+    username = st.text_input("Usuario")
+    password = st.text_input("Contraseña", type="password")
 
-    # Verificar si ya está autenticado
-    if session_state.logged_in:
-        st.success(f"Bienvenido, {session_state.username}!")
-        # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
-        st.write("Inicio de sesión exitoso")
-    else:
-        # Formulario de inicio de sesión
-        username = st.text_input("Usuario")
-        password = st.text_input("Contraseña", type="password")
-
-        if st.button("Iniciar Sesión"):
-            # Se almacenan los datos necesarios de la DB
-            all_users = fetch_usuarios()
-            usernames = get_usernames_usuarios()
-            passwords = [all_users[username]["password"] for username in usernames]
-
-            # Se crea el diccionario credentials necesario para el
-            # funcionamiento del autenticador de cuentas
-            credentials = {"usernames": {}}
-            for username in usernames:
-                credentials["usernames"][username] = {"name": all_users[username]["key"],
-                                                      "password": all_users[username]["password"]}
-
+    if st.button("Iniciar Sesión"):
+        if username in usernames:
             if login(username, password, credentials):
-                # Actualizar el estado de inicio de sesión en la sesión
-                session_state.logged_in = True
-                session_state.username = username
-
                 st.success(f"Bienvenido, {username}!")
                 # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
                 st.write("Inicio de sesión exitoso")
             else:
                 st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
+        else:
+            st.error("Usuario no encontrado. Por favor, regístrese.")
+
+# Se almacenan los datos necesarios de la DB
+all_users = fetch_usuarios()
+usernames = get_usernames_usuarios()
+passwords = [all_users[username]["password"] for username in usernames]
+
+# Se crea el diccionario credentials necesario para el
+# funcionamiento del autenticador de cuentas
+credentials = {"usernames": {}}
+for username in usernames:
+    credentials["usernames"][username] = {"name": all_users[username]["key"],
+                                          "password": all_users[username]["password"]}
 
 if __name__ == "__main__":
     main()
