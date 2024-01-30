@@ -12,34 +12,27 @@ deta = Deta(DETA_KEY)
 # Realizamos la conexión a la DB
 db = deta.Base("NutribalanceUsers")
 
-# Funciones de utilidad
-def fetch_users():
+import streamlit as st
+from datetime import datetime
+
+# Tu función fetch_usuarios
+def fetch_usuarios():
     users = db.fetch()
     return users.items
 
-def get_emails_usuarios():
-    users = db.fetch()
-    emails = [user["key"] for user in users.items]
-    return emails
-
-def get_usernames_usuarios():
-    users = db.fetch()
-    usernames = [user["username"] for user in users.items]
-    return usernames
-
-import streamlit as st
-
-# Credenciales de usuario (solo para fines de demostración, no utilizar en un entorno de producción)
-credenciales = {"usuario1": "contrasena1", "usuario2": "contrasena2"}
-
+# Tu función de inicio de sesión
 def login(username, password):
     """
-    Función de inicio de sesión simple.
+    Función de inicio de sesión que verifica las credenciales
+    con los usuarios registrados en la base de datos.
     """
-    if username in credenciales and credenciales[username] == password:
-        return True
+    usuarios = fetch_usuarios()
+    for usuario in usuarios:
+        if usuario["username"] == username and usuario["password"] == password:
+            return True
     return False
 
+# Tu función principal
 def main():
     st.title("Inicio de Sesión")
 
@@ -57,4 +50,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
