@@ -62,9 +62,6 @@ def get_emails_usuarios():
 def main():
     st.title("Inicio de Sesión")
 
-    users = fetch_usuarios()
-    st.write(users)
-
     # Formulario de inicio de sesión
     username = st.text_input("Usuario")
     password = st.text_input("Contraseña", type="password")
