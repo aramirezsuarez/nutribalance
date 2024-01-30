@@ -26,12 +26,9 @@ def get_usernames_usuarios():
     - list: Una lista que contiene los nombres de usuario de
     todos los usuarios registrados.
     """
-    # guardamos los datos de la DB en users
-    users = db.fetch()
-    usernames = []
-    # filtramos los usernames de la DB
-    for user in users.items:
-        usernames.append(user)
+    # guardamos las claves (nombres de usuario) de los datos de la DB
+    users = fetch_usuarios()
+    usernames = list(users.keys())
     return usernames
 
 # Tu función de inicio de sesión
@@ -56,11 +53,8 @@ def get_emails_usuarios():
     todos los usuarios registrados.
     """
     # guardamos los datos de la DB en users
-    users = db.fetch()
-    emails = []
-    # filtramos los emails de la DB
-    for user in users.items:
-        emails.append(user)
+    users = fetch_usuarios()
+    emails = list(users.keys())
     return emails
 
 # Tu función principal
@@ -76,7 +70,7 @@ def main():
         users = fetch_usuarios()
         emails = get_emails_usuarios()
         usernames = get_usernames_usuarios()
-        passwords = [user for user in users]
+        passwords = [users[username]["password"] for username in usernames]
 
         # Se crea el diccionario credentials necesario para el
         # funcionamiento del autenticador de cuentas
