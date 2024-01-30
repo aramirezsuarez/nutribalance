@@ -61,32 +61,35 @@ def get_emails_usuarios():
 # Tu función principal
 def main():
     st.title("Inicio de Sesión")
-    users = fetch_usuarios()
-    st.write(users)
+    st.write(all_users)
 
     # Formulario de inicio de sesión
     username = st.text_input("Usuario")
     password = st.text_input("Contraseña", type="password")
 
     if st.button("Iniciar Sesión"):
-        # Se almacenan los datos necesarios de la DB
-        users = fetch_usuarios()
-        usernames = get_usernames_usuarios()
-        passwords = [users[username]["password"] for username in usernames]
-
-        # Se crea el diccionario credentials necesario para el
-        # funcionamiento del autenticador de cuentas
-        credentials = {"usernames": {}}
-        for username in usernames:
-            credentials["usernames"][username] = {"name": users[username]["key"],
-                                                  "password": users[username]["password"]}
-
-        if login(username, password, credentials):
-            st.success(f"Bienvenido, {username}!")
-            # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
-            st.write("Inicio de sesión exitoso")
+        if username in usernames:
+            if login(username, password, credentials):
+                st.success(f"Bienvenido, {username}!")
+                # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
+                st.write("Inicio de sesión exitoso")
+            else:
+                st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
         else:
-            st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
+            st.error("Usuario no encontrado. Por favor, regístrese.")
+
+# Se almacenan los datos necesarios de la DB
+all_users = fetch_usuarios()
+usernames = get_usernames_usuarios()
+passwords = [all_users[username]["password"] for username in usernames]
+
+# Se crea el diccionario credentials necesario para el
+# funcionamiento del autenticador de cuentas
+credentials = {"usernames": {}}
+for username in usernames:
+    credentials["usernames"][username] = {"name": all_users[username]["key"],
+                                          "password": all_users[username]["password"]}
 
 if __name__ == "__main__":
     main()
+
