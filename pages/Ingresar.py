@@ -151,6 +151,45 @@ def actualizar_datos_usuario(username, new_username, new_password):
             return True
     return False
 
+# Se almacenan los datos necesarios de la DB
+    users = fetch_usuarios()
+    emails = get_emails_usuarios()
+    usernames = get_usernames_usuarios()
+    passwords = [user["password"] for user in users]
+
+    # Se crea el diccionario credentials necesario para el
+    # funcionamiento del autenticador de cuentas
+    credentials = {"usernames" : {}}
+    for index in range(len(emails)):
+        credentials["usernames"][usernames[index]] = {"name" : emails[index],
+                                                "password" : passwords[index]}
+
+    # Creacion del autenticador
+    Authenticator = stauth.Authenticate(credentials, cookie_name="Streamlit",
+                                        key="cookiekey", cookie_expiry_days=3)
+
+    # La funcion login regresa una tupla con estos
+    # 3 valores los cuales atrapamos
+    email, authentication_status, username = Authenticator.login("Ingresar",
+                                                                    "main")
+
+    # Comprobacion de la existencia del username dentro de la DB
+    # y mensajes de advertencia en caso de un mal inicio de sesion
+    if username:
+        if username in usernames:
+            if authentication_status:
+                st.write(f"Bienvenido {username}")
+                # Creacion de boton de cerrar sesion en la barra lateral
+                Authenticator.logout("Cerrar sesion", location="sidebar")
+            elif not authentication_status:
+                st.warning("Contraseña o nombre de usuario incorrectos")
+            else:
+                st.warning("Por favor ingrese todos los campos")
+    else:
+        st.warning("Nombre de usuario no existe, por favor registrese")
+
+
+
 
 # Crear pie de pagina con los datos de contacto de los creadores
 footer = """
