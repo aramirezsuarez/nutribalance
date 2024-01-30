@@ -1,9 +1,20 @@
 import streamlit as st
+import streamlit_extras
 import streamlit_authenticator as stauth
-from dependancies import sign_up, fetch_users
+import re
+from deta import Deta
+from Registrarse import sign_up, registro
 
 
 st.set_page_config(page_title='Inicio de sesion')
+
+def fetch_users():
+    """
+    Fetch Users
+    :return Dictionary of Users:
+    """
+    users = db.fetch()
+    return users.items
 
 
 try:
