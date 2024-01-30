@@ -133,3 +133,13 @@ try:
             if authentication_status:
                 st.write(f"Bienvenido {username}")
                 Authenticator.logout("Cerrar sesion", location="sidebar")
+            elif not authentication_status:
+                st.warning("Contraseña o nombre de usuario incorrectos")
+            else:
+                st.warning("Por favor ingrese todos los campos")
+        else:
+            st.warning("Nombre de usuario no existe, por favor registrese")
+
+# Informar de que hubo una excepcion en caso de que la haya
+except:
+    st.error("Excepcion lanzada")
