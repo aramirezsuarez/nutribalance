@@ -82,7 +82,7 @@ def main():
         if login(username, password, credentials):
             st.success(f"Bienvenido, {username}!")
             # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
-            st.write("Aquí va el contenido de tu aplicación.")
+            st.write("Inicio de sesión exitoso")
         else:
             st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
 
