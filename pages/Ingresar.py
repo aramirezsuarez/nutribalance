@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit_authenticator as stauth
 from datetime import datetime
 from deta import Deta
 
@@ -33,6 +34,17 @@ def get_usernames_usuarios():
         usernames.append(user["username"])
     return usernames
 
+# Tu función de inicio de sesión
+def login(username, password, credentials):
+    """
+    Función de inicio de sesión que verifica las credenciales
+    con los usuarios registrados en la base de datos.
+    """
+    for user in credentials["usernames"]:
+        if user["name"] == username and user["password"] == password:
+            return True
+    return False
+
 def get_emails_usuarios():
     """
     Recupera y devuelve una lista con las direcciones de correo
@@ -50,33 +62,34 @@ def get_emails_usuarios():
         emails.append(user["key"])
     return emails
 
-# Se almacenan los datos necesarios de la DB
-users = fetch_usuarios()
-emails = get_emails_usuarios()
-usernames = get_usernames_usuarios()
-passwords = [user["password"] for user in users]
+# Tu función principal
+def main():
+    st.title("Inicio de Sesión")
 
-# Se crea el diccionario credentials necesario para el
-# funcionamiento del autenticador de cuentas
-credentials = {"usernames": {}}
-for index in range(len(emails)):
-    credentials["usernames"][usernames[index]] = {"name": emails[index],
-                                                  "password": passwords[index]}
+    # Formulario de inicio de sesión
+    username = st.text_input("Usuario")
+    password = st.text_input("Contraseña", type="password")
 
-def login(username, password, credentials):
-    """
-    Función de inicio de sesión que verifica las credenciales
-    con los usuarios registrados en la base de datos.
-    """
-    for user in credentials["usernames"]:
-        if user["name"] == username and user["password"] == password:
-            return True
-    return False
+    if st.button("Iniciar Sesión"):
+        # Se almacenan los datos necesarios de la DB
+        users = fetch_usuarios()
+        emails = get_emails_usuarios()
+        usernames = get_usernames_usuarios()
+        passwords = [user["password"] for user in users]
 
-# Luego, puedes llamar a la función login con tus credenciales
-if login(username, password, credentials):
-    st.success(f"Bienvenido, {username}!")
-    # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
-    st.write("Aquí va el contenido de tu aplicación.")
-else:
-    st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
+        # Se crea el diccionario credentials necesario para el
+        # funcionamiento del autenticador de cuentas
+        credentials = {"usernames": {}}
+        for index in range(len(emails)):
+            credentials["usernames"][usernames[index]] = {"name": emails[index],
+                                                          "password": passwords[index]}
+
+        if login(username, password, credentials):
+            st.success(f"Bienvenido, {username}!")
+            # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
+            st.write("Aquí va el contenido de tu aplicación.")
+        else:
+            st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
+
+if __name__ == "__main__":
+    main()
