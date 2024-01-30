@@ -151,7 +151,8 @@ def actualizar_datos_usuario(username, new_username, new_password):
             return True
     return False
 
-# Se almacenan los datos necesarios de la DB
+try:
+    # Se almacenan los datos necesarios de la DB
     users = fetch_usuarios()
     emails = get_emails_usuarios()
     usernames = get_usernames_usuarios()
@@ -159,10 +160,10 @@ def actualizar_datos_usuario(username, new_username, new_password):
 
     # Se crea el diccionario credentials necesario para el
     # funcionamiento del autenticador de cuentas
-    credentials = {"usernames" : {}}
+    credentials = {"usernames": {}}
     for index in range(len(emails)):
-        credentials["usernames"][usernames[index]] = {"name" : emails[index],
-                                                "password" : passwords[index]}
+        credentials["usernames"][usernames[index]] = {"name": emails[index],
+                                                       "password": passwords[index]}
 
     # Creacion del autenticador
     Authenticator = stauth.Authenticate(credentials, cookie_name="Streamlit",
@@ -171,7 +172,7 @@ def actualizar_datos_usuario(username, new_username, new_password):
     # La funcion login regresa una tupla con estos
     # 3 valores los cuales atrapamos
     email, authentication_status, username = Authenticator.login("Ingresar",
-                                                                    "main")
+                                                                 "main")
 
     # Comprobacion de la existencia del username dentro de la DB
     # y mensajes de advertencia en caso de un mal inicio de sesion
@@ -185,8 +186,11 @@ def actualizar_datos_usuario(username, new_username, new_password):
                 st.warning("Contraseña o nombre de usuario incorrectos")
             else:
                 st.warning("Por favor ingrese todos los campos")
-    else:
-        st.warning("Nombre de usuario no existe, por favor registrese")
+        else:
+            st.warning("Nombre de usuario no existe, por favor registrese")
+except:
+    st.error("Excepcion lanzada")
+
 
 
 
