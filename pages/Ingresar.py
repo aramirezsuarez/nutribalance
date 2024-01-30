@@ -27,43 +27,34 @@ def get_usernames_usuarios():
     usernames = [user["username"] for user in users.items]
     return usernames
 
-# Resto del código
-users = fetch_users()
-emails = []
-usernames = []
-passwords = []
+import streamlit as st
 
-for user in users:
-    emails.append(user['key'])
-    usernames.append(user['username'])
-    passwords.append(user['password'])
+# Credenciales de usuario (solo para fines de demostración, no utilizar en un entorno de producción)
+credenciales = {"usuario1": "contrasena1", "usuario2": "contrasena2"}
 
-credentials = {'usernames': {}}
-for index in range(len(emails)):
-    credentials['usernames'][usernames[index]] = {'name': emails[index], 'password': passwords[index]}
+def login(username, password):
+    """
+    Función de inicio de sesión simple.
+    """
+    if username in credenciales and credenciales[username] == password:
+        return True
+    return False
 
-Authenticator = stauth.Authenticate(credentials, cookie_name='Streamlit', key='abcdef', cookie_expiry_days=4)
+def main():
+    st.title("Inicio de Sesión")
 
-authentication_status = Authenticator.login(':green[Login]', 'main')
+    # Formulario de inicio de sesión
+    username = st.text_input("Usuario")
+    password = st.text_input("Contraseña", type="password")
 
-
-info, info1 = st.columns(2)
-
-if not authentication_status:
-    sign_up()
-
-if username:
-    if username in usernames:
-        if authentication_status:
-            st.sidebar.subheader(f'Bienvenido {username}')
-            Authenticator.logout('Cerrar sesión', 'sidebar')
-
-        elif not authentication_status:
-            with info:
-                st.error('Contraseña o Usuario Incorrecto')
+    if st.button("Iniciar Sesión"):
+        if login(username, password):
+            st.success(f"Bienvenido, {username}!")
+            # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
+            st.write("Aquí va el contenido de tu aplicación.")
         else:
-            with info:
-                st.warning('Por favor introduzca sus credenciales')
-    else:
-        with info:
-            st.warning('Usuario no encontrado, Por favor regístrese')
+            st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
+
+if __name__ == "__main__":
+    main()
+
