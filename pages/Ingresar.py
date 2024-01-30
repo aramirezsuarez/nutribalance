@@ -151,38 +151,6 @@ def actualizar_datos_usuario(username, new_username, new_password):
             return True
     return False
 
-def main():
-    """
-    Función principal que maneja la lógica de la aplicación.
-    """
-    st.title("Nutribalance App")
-
-    menu = ["Home", "Login", "SignUp"]
-    choice = st.sidebar.selectbox("Menu", menu)
-
-    if choice == "Home":
-        st.subheader("Home")
-        # Aquí puedes poner información sobre tu aplicación
-
-    elif choice == "Login":
-        st.subheader("Login Section")
-
-        username = st.sidebar.text_input("User Name")
-        password = st.sidebar.text_input("Password", type='password')
-
-        if st.sidebar.checkbox("Login"):
-            # Aquí puedes poner la lógica de autenticación
-
-    elif choice == "SignUp":
-        st.subheader("Create New Account")
-        new_user = st.text_input("Username")
-        new_password = st.text_input("Password", type='password')
-
-        if st.button("Signup"):
-            # Aquí puedes poner la lógica para crear un nuevo usuario
-
-if __name__ == "__main__":
-    main()
 
 # Crear pie de pagina con los datos de contacto de los creadores
 footer = """
