@@ -12,6 +12,16 @@ deta = Deta(DETA_KEY)
 # Realizamos la conexión a la DB
 db = deta.Base("NutribalanceUsers")
 
+class SessionState(object):
+    def __init__(self, **kwargs):
+        for key, val in kwargs.items():
+            setattr(self, key, val)
+
+def get(**kwargs):
+    if not hasattr(st, '_session_state'):
+        st._session_state = SessionState(**kwargs)
+    return st._session_state
+
 # Tu función fetch_usuarios
 def fetch_usuarios():
     users = db.fetch()
@@ -65,6 +75,9 @@ def main():
     # Formulario de inicio de sesión
     username = st.text_input("Usuario")
     password = st.text_input("Contraseña", type="password")
+    session_state = get(username="", password="")
+    session_state.username = username
+    session_state.password = password
 
     if st.button("Iniciar Sesión"):
         if username in usernames:
@@ -72,10 +85,15 @@ def main():
                 st.success(f"Bienvenido, {username}!")
                 # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
                 st.write("Inicio de sesión exitoso")
+                session_state.logged_in = True
             else:
                 st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
         else:
             st.error("Usuario no encontrado. Por favor, regístrese.")
+    if session_state.logged_in:
+        if st.button("Cerrar Sesión"):
+            session_state.logged_in = False
+            st.write("Sesión cerrada con éxito")
 
 # Se almacenan los datos necesarios de la DB
 all_users = fetch_usuarios()
