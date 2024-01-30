@@ -1,5 +1,4 @@
 import streamlit as st
-from streamlit_set_page_config import set_page_config
 from datetime import datetime
 from deta import Deta
 
@@ -66,13 +65,15 @@ def get_emails_usuarios():
     emails = list(users.keys())
     return emails
 
-# Establecer la configuración de la página con la extensión
-set_page_config(
-    page_title="Inicio de Sesión",
-    page_icon=":key:",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+# Establecer configuraciones de la página
+page_settings = """
+<style>
+body {
+  color: #f00;
+}
+</style>
+"""
+st.markdown(page_settings, unsafe_allow_html=True)
 
 # Función principal
 def main():
