@@ -1,3 +1,8 @@
+import streamlit as st
+import streamlit_authenticator as stauth
+from datetime import datetime
+from deta import Deta
+
 # Almacenamos la key de la base de datos en una constante
 DETA_KEY = "e0qgr2zg4tq_mbZWcCg7iGCpWFBbCy3GGFjEYHdFmZYR"
 
