@@ -63,27 +63,20 @@ for index in range(len(emails)):
     credentials["usernames"][usernames[index]] = {"name": emails[index],
                                                   "password": passwords[index]}
 
-# Tu función principal
-def main():
-    st.title("Inicio de Sesión")
+def login(username, password, credentials):
+    """
+    Función de inicio de sesión que verifica las credenciales
+    con los usuarios registrados en la base de datos.
+    """
+    for user in credentials["usernames"]:
+        if user["name"] == username and user["password"] == password:
+            return True
+    return False
 
-    # Formulario de inicio de sesión
-    username = st.text_input("Usuario")
-    password = st.text_input("Contraseña", type="password")
-
-    if username:
-        if username in usernames:
-            # Agrega el código relacionado con la autenticación aquí
-            pass  # Este bloque de código debería contener la lógica de autenticación
-
-    if st.button("Iniciar Sesión"):
-        # La lógica de autenticación debería estar aquí
-        if login(username, password):
-            st.success(f"Bienvenido, {username}!")
-            # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
-            st.write("Aquí va el contenido de tu aplicación.")
-        else:
-            st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
-
-if __name__ == "__main__":
-    main()
+# Luego, puedes llamar a la función login con tus credenciales
+if login(username, password, credentials):
+    st.success(f"Bienvenido, {username}!")
+    # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
+    st.write("Aquí va el contenido de tu aplicación.")
+else:
+    st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
