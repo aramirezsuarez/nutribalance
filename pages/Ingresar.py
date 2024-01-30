@@ -17,6 +17,9 @@ class SessionState:
         self.logged_in = False
         self.username = ""
 
+# Obtener el estado de la sesión
+session_state = SessionState()
+
 # Tu función fetch_usuarios
 def fetch_usuarios():
     users = db.fetch()
@@ -66,9 +69,6 @@ def get_emails_usuarios():
 # Tu función principal
 def main():
     st.title("Inicio de Sesión")
-
-    # Obtener la información de la sesión
-    session_state = SessionState()
 
     # Formulario de inicio de sesión
     username = st.text_input("Usuario")
