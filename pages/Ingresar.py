@@ -1,7 +1,11 @@
+# Pagina de inicio de sesion
+
 # Importar librerias necesarias
 import streamlit as st
-from deta import Deta
+import streamlit_extras
 import streamlit_authenticator as stauth
+import re
+from deta import Deta
 
 # Almacenamos la key de la base de datos en una constante
 DETA_KEY = "e0qgr2zg4tq_mbZWcCg7iGCpWFBbCy3GGFjEYHdFmZYR"
@@ -11,20 +15,6 @@ deta = Deta(DETA_KEY)
 
 # Realizamos la conexion a la DB
 db = deta.Base("NutribalanceUsers")
-
-# Se almacenan los datos necesarios de la DB
-users = db.fetch()
-emails = [user["key"] for user in users.items]
-usernames = [user["username"] for user in users.items]
-passwords = [user["password"] for user in users.items]
-
-# Se crea el diccionario credentials necesario para el funcionamiento del autenticador de cuentas
-credentials = {"usernames": {}}
-for index in range(len(emails)):
-    credentials["usernames"][usernames[index]] = {"name": emails[index], "password": passwords[index]}
-
-# Creacion del autenticador
-Authenticator = stauth.Authenticate(credentials, cookie_name="Streamlit", key="cookiekey", cookie_expiry_days=3)
 
 # Funcion para registrar usuarios en la DB
 def insertar_usuario(email, username, age, height, password):
@@ -41,40 +31,147 @@ def insertar_usuario(email, username, age, height, password):
     Returns:
     - bool: True si la inserción fue exitosa, False si hubo un error.
     """
-    try:
-        db.put({"key": email, "username": username, "age": age, "height": height, "password": password})
+    return db.put({"key": email, "username": username, "age": age,
+                   "height": height, "password": password})
+
+# Funcion que retorna los usuarios registrados
+def fetch_usuarios():
+    """
+   Recupera y devuelve un diccionario con los usuarios
+   registrados en la Base de Datos.
+
+   Returns:
+   - dict: Un diccionario que contiene la información de los
+   usuarios registrados.
+   Cada clave es la dirección de correo electrónico única del usuario,
+   y cada valor es un diccionario con detalles como
+   "username", "age", "height", y "password".
+   """
+    # guardamos los datos de la DB en users y retornamos su contenido
+    users = db.fetch()
+    return users.items
+
+# Funcion que retorna los emails de los usuarios registrados
+def get_emails_usuarios():
+    """
+    Recupera y devuelve una lista con las direcciones de correo
+    electrónico de cada usuario registrado en la Base de Datos.
+
+    Returns:
+    - list: Una lista que contiene las direcciones de correo electrónico de
+    todos los usuarios registrados.
+    """
+    # guardamos los datos de la DB en users
+    users = db.fetch()
+    emails = []
+    # filtramos los emails de la DB
+    for user in users.items:
+        emails.append(user["key"])
+    return emails
+
+# Funcion que retorna los nombres de usuario de los usuarios registrados
+def get_usernames_usuarios():
+    """
+    Recupera y devuelve una lista con los nombres de usuario de cada
+    usuario registrado en la Base de Datos.
+
+    Returns:
+    - list: Una lista que contiene los nombres de usuario de
+    todos los usuarios registrados.
+    """
+    # guardamos los datos de la DB en users
+    users = db.fetch()
+    usernames = []
+    # filtramos los usernames de la DB
+    for user in users.items:
+        usernames.append(user["username"])
+    return usernames
+
+# Funcion que verifica si un email ingresado es valido
+def validar_email(email):
+    """
+   Retorna True si el email ingresado es válido, de lo contrario retorna False
+
+   Parameters:
+   - email (str): Dirección de correo electrónico a validar.
+
+   Returns:
+   - bool: True si el email es válido, False si no lo es.
+   """
+    # Patrones tipicos de un email valido
+    pattern = "^[a-zA-Z0_9-_]+@[a-zA-Z0_9-_]+\.[a-z]{1,3}$"
+    pattern1 = "^[a-zA-Z0_9-_]+@[a-zA-Z0_9-_]+\.[a-z]{1,3}+\.[a-z]{1,3}$"
+
+    # Verifica si el email ingresado coincide con algun patron definido
+    if re.match(pattern, email) or re.match(pattern1, email):
         return True
-    except Exception as e:
-        st.error(f"Error al insertar usuario: {e}")
-        return False
+    return False
 
-# Página de inicio de sesión
-def login():
-    st.subheader("Iniciar Sesión")
+# Funcion que verifica si un username ingresado es valido
+def validar_username(username):
+    """
+    Retorna True si el nombre de usuario ingresado es válido,
+    de lo contrario, retorna False.
 
-    # Formulario de inicio de sesión
-    with st.form(key="login_form", clear_on_submit=True):
-        username = st.text_input("Nombre de Usuario")
-        password = st.text_input("Contraseña", type="password")
-        submit_button = st.form_submit_button("Iniciar Sesión")
+    Parameters:
+    - username (str): Nombre de usuario a validar.
 
-    # Validar la información del formulario
-    if submit_button:
-        if username in credentials["usernames"] and stauth.Hasher([password]).verify(credentials["usernames"][username]["password"]):
-            st.success("Inicio de sesión exitoso")
-            st.session_state["authentication_status"] = True
-        else:
-            st.error("Credenciales incorrectas")
+    Returns:
+    - bool: True si el nombre de usuario es válido, False si no lo es.
+    """
+    # Se define el patron de un username tipico
+    pattern = "^[a-zA-Z0-9]*$"
+    # Se verifica si el username ingresado coincide con el patron tipico
+    if re.match(pattern, username):
+        return True
+    return False
 
-# Página principal
-def main():
-    # Verificar si el usuario está autenticado
-    if st.session_state.get("authentication_status", False):
-        st.write("¡Ya has iniciado sesión!")
-        st.button("Cerrar Sesión", on_click=Authenticator.logout)
-    else:
-        login()
+# Función para actualizar la contraseña y/o el nombre de usuario
+def actualizar_datos_usuario(username, new_username, new_password):
+    """
+    Actualiza la contraseña y/o el nombre de usuario de un usuario registrado.
 
-# Ejecutar la aplicación principal
-if __name__ == "__main__":
-    main()
+    Parameters:
+    - username (str): Nombre de usuario actual del usuario.
+    - new_username (str): Nuevo nombre de usuario (puede ser el mismo).
+    - new_password (str): Nueva contraseña (puede ser la misma).
+
+    Returns:
+    - bool: True si la actualización fue exitosa, False si hubo un error.
+    """
+    users = db.fetch()
+    for user in users.items:
+        if user["username"] == username:
+            if new_username:
+                user["username"] = new_username
+            if new_password:
+                new_encrypted_password = stauth.Hasher([new_password]).generate()
+                user["password"] = new_encrypted_password[0]
+            db.put(user)
+            return True
+    return False
+
+
+# Crear pie de pagina con los datos de contacto de los creadores
+footer = """
+<style>
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: rgb(14, 17, 23);
+        color: black;
+        text-align: center;
+    }
+    .footer p {
+        color: white;
+    }
+</style>
+<div class="footer">
+    <p>App desarrollada por: <br />
+    Luis Fernando López Echeverri | Andres Felipe Ramirez Suarez <br />
+    Contactenos: <a href="#">lulopeze@unal.edu.co</a> | <a href="#">aramirezsu@unal.edu.co</a></p>
+</div>
+"""
+st.markdown(footer,unsafe_allow_html=True)
