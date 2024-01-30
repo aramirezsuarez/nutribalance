@@ -61,7 +61,6 @@ def get_emails_usuarios():
 # Tu función principal
 def main():
     st.title("Inicio de Sesión")
-    st.write(all_users)
 
     # Formulario de inicio de sesión
     username = st.text_input("Usuario")
