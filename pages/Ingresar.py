@@ -56,9 +56,9 @@ def main():
     if st.button("Iniciar Sesión"):
         if username in usernames and login(username, password, users):
             # Obtener el token de sesión existente o crear uno nuevo
-            session_id = get_session_token(username) or f"{username}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            #session_id = get_session_token(username) or f"{username}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
             # Guardar el token de sesión en la base de datos
-            save_session_token(username, session_id)
+           # save_session_token(username, session_id)
             st.success(f"Bienvenido, {username}!")
             # Agregar el contenido de la aplicación después del inicio de sesión exitoso.
             st.write("Inicio de sesión exitoso")
