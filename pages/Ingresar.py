@@ -3,7 +3,7 @@ import streamlit_extras
 import streamlit_authenticator as stauth
 import re
 from deta import Deta
-from Registrarse import sign_up, registro
+from Registrarse import registro
 
 
 st.set_page_config(page_title='Inicio de sesion')
