@@ -1,161 +1,52 @@
-# Importar librerias necesarias
 import streamlit as st
-import streamlit_extras
 import streamlit_authenticator as stauth
-import re
-from deta import Deta
+from dependancies import sign_up, fetch_users
 
-# Almacenamos la key de la base de datos en una constante
-DETA_KEY = "e0qgr2zg4tq_mbZWcCg7iGCpWFBbCy3GGFjEYHdFmZYR"
 
-# Creamos nuestro objeto deta para hacer la conexión a la DB
-deta = Deta(DETA_KEY)
+st.set_page_config(page_title='Inicio de sesion')
 
-# Realizamos la conexión a la DB
-db = deta.Base("NutribalanceUsers")
 
-# Funcion para registrar usuarios en la DB
-def insertar_usuario(email, username, age, height, password):
-    """
-    Agrega un nuevo usuario a la Base de Datos.
-
-    Parameters:
-    - email (str): Dirección de correo electrónico única del usuario.
-    - username (str): Nombre de usuario único del usuario.
-    - age (int): Edad del usuario.
-    - height (float): Altura del usuario en centímetros.
-    - password (str): Contraseña del usuario.
-
-    Returns:
-    - bool: True si la inserción fue exitosa, False si hubo un error.
-    """
-    return db.put({"key": email, "username": username, "age": age,
-                   "height": height, "password": password})
-
-# Funcion que retorna los usuarios registrados
-def fetch_usuarios():
-    """
-    Recupera y devuelve un diccionario con los usuarios
-    registrados en la Base de Datos.
-
-    Returns:
-    - dict: Un diccionario que contiene la información de los
-    usuarios registrados.
-    Cada clave es la dirección de correo electrónico única del usuario,
-    y cada valor es un diccionario con detalles como
-    "username", "age", "height", y "password".
-    """
-    # guardamos los datos de la DB en users y retornamos su contenido
-    users = db.fetch()
-    return users.items
-
-# Funcion que retorna los emails de los usuarios registrados
-def get_emails_usuarios():
-    """
-    Recupera y devuelve una lista con las direcciones de correo
-    electrónico de cada usuario registrado en la Base de Datos.
-
-    Returns:
-    - list: Una lista que contiene las direcciones de correo electrónico de
-    todos los usuarios registrados.
-    """
-    # guardamos los datos de la DB en users
-    users = db.fetch()
+try:
+    users = fetch_users()
     emails = []
-    # filtramos los emails de la DB
-    for user in users.items:
-        emails.append(user["key"])
-    return emails
-
-# Funcion que retorna los nombres de usuario de los usuarios registrados
-def get_usernames_usuarios():
-    """
-    Recupera y devuelve una lista con los nombres de usuario de cada
-    usuario registrado en la Base de Datos.
-
-    Returns:
-    - list: Una lista que contiene los nombres de usuario de
-    todos los usuarios registrados.
-    """
-    # guardamos los datos de la DB en users
-    users = db.fetch()
     usernames = []
-    # filtramos los usernames de la DB
-    for user in users.items:
-        usernames.append(user["username"])
-    return usernames
+    passwords = []
 
-# Funcion que verifica si un email ingresado es valido
-def validar_email(email):
-    """
-    Retorna True si el email ingresado es válido, de lo contrario retorna False.
+    for user in users:
+        emails.append(user['key'])
+        usernames.append(user['username'])
+        passwords.append(user['password'])
 
-    Parameters:
-    - email (str): Dirección de correo electrónico a validar.
+    credentials = {'usernames': {}}
+    for index in range(len(emails)):
+        credentials['usernames'][usernames[index]] = {'name': emails[index], 'password': passwords[index]}
 
-    Returns:
-    - bool: True si el email es válido, False si no lo es.
-    """
-    # Patrones típicos de un email valido
-    pattern = "^[a-zA-Z0_9-_]+@[a-zA-Z0_9-_]+\.[a-z]{1,3}$"
-    pattern1 = "^[a-zA-Z0_9-_]+@[a-zA-Z0_9-_]+\.[a-z]{1,3}+\.[a-z]{1,3}$"
+    Authenticator = stauth.Authenticate(credentials, cookie_name='Streamlit', key='abcdef', cookie_expiry_days=4)
 
-    # Verifica si el email ingresado coincide con algun patrón definido
-    if re.match(pattern, email) or re.match(pattern1, email):
-        return True
-    return False
+    email, authentication_status, username = Authenticator.login(':green[Login]', 'main')
 
-# Funcion que verifica si un username ingresado es valido
-def validar_username(username):
-    """
-    Retorna True si el nombre de usuario ingresado es válido,
-    de lo contrario, retorna False.
+    info, info1 = st.columns(2)
 
-    Parameters:
-    - username (str): Nombre de usuario a validar.
+    if not authentication_status:
+        sign_up()
 
-    Returns:
-    - bool: True si el nombre de usuario es válido, False si no lo es.
-    """
-    # Se define el patrón de un username tipico
-    pattern = "^[a-zA-Z0-9]*$"
-    # Se verifica si el username ingresado coincide con el patrón tipico
-    if re.match(pattern, username):
-        return True
-    return False
+    if username:
+        if username in usernames:
+            if authentication_status:
+                st.sidebar.subheader(f'Bienvenido {username}')
+                Authenticator.logout('Cerrar sesión', 'sidebar')
 
-# Se almacenan los datos necesarios de la DB
-users = fetch_usuarios()
-emails = get_emails_usuarios()
-usernames = get_usernames_usuarios()
-passwords = [user["password"] for user in users]
 
-# Se crea el diccionario credentials necesario para el
-# funcionamiento del autenticador de cuentas
-credentials = {"usernames": {}}
-for index in range(len(emails)):
-    credentials["usernames"][usernames[index]] = {"name": emails[index],
-                                                   "password": passwords[index]}
-
-# Creacion del autenticador
-Authenticator = stauth.Authenticate(credentials, cookie_name="Streamlit",
-                                    key="cookiekey", cookie_expiry_days=3)
-
-# La funcion login regresa una tupla con estos
-# 3 valores los cuales atrapamos
-email, authentication_status, username = Authenticator.login("Ingresar", "main")
-
-# Comprobacion de la existencia del username dentro de la DB
-# y mensajes de advertencia en caso de un mal inicio de sesion
-if username:
-    if username in usernames:
-        if authentication_status:
-            st.write(f"Bienvenido {username}")
-            # Creacion de boton de cerrar sesion en la barra lateral
-            Authenticator.logout("Cerrar sesion", location="sidebar")
-        elif not authentication_status:
-            st.warning("Contraseña o nombre de usuario incorrectos")
+            elif not authentication_status:
+                with info:
+                    st.error('Contraseña o Usuario Incorrecto')
+            else:
+                with info:
+                    st.warning('Por favor introduzca sus credenciales')
         else:
-            st.warning("Por favor ingrese todos los campos")
-    else:
-        st.warning("Nombre de usuario no existe, por favor registrese")
+            with info:
+                st.warning('Usuario no encontrado, Por favor registrese')
+
+
+except:
+    st.success('Inicio de sesion correcto')
