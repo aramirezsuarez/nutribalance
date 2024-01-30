@@ -31,7 +31,7 @@ def get_usernames_usuarios():
     usernames = []
     # filtramos los usernames de la DB
     for user in users.items:
-        usernames.append(user["username"])
+        usernames.append(user)
     return usernames
 
 # Tu función de inicio de sesión
@@ -40,8 +40,9 @@ def login(username, password, credentials):
     Función de inicio de sesión que verifica las credenciales
     con los usuarios registrados en la base de datos.
     """
-    for user in credentials["usernames"]:
-        if user["name"] == username and user["password"] == password:
+    if username in credentials["usernames"]:
+        stored_user = credentials["usernames"][username]
+        if stored_user["password"] == password:
             return True
     return False
 
@@ -59,7 +60,7 @@ def get_emails_usuarios():
     emails = []
     # filtramos los emails de la DB
     for user in users.items:
-        emails.append(user["key"])
+        emails.append(user)
     return emails
 
 # Tu función principal
@@ -75,7 +76,7 @@ def main():
         users = fetch_usuarios()
         emails = get_emails_usuarios()
         usernames = get_usernames_usuarios()
-        passwords = [user["password"] for user in users]
+        passwords = [user for user in users]
 
         # Se crea el diccionario credentials necesario para el
         # funcionamiento del autenticador de cuentas
