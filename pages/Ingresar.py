@@ -1,4 +1,4 @@
-mport streamlit as st
+import streamlit as st
 import streamlit_authenticator as stauth
 from datetime import datetime
 from deta import Deta
