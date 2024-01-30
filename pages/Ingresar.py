@@ -52,7 +52,7 @@ def get_emails_usuarios():
     - list: Una lista que contiene las direcciones de correo electrónico de
     todos los usuarios registrados.
     """
-    # guardamos los datos de la DB en users
+    # guardamos las claves (nombres de usuario) de los datos de la DB
     users = fetch_usuarios()
     emails = list(users.keys())
     return emails
@@ -68,16 +68,15 @@ def main():
     if st.button("Iniciar Sesión"):
         # Se almacenan los datos necesarios de la DB
         users = fetch_usuarios()
-        emails = get_emails_usuarios()
         usernames = get_usernames_usuarios()
         passwords = [users[username]["password"] for username in usernames]
 
         # Se crea el diccionario credentials necesario para el
         # funcionamiento del autenticador de cuentas
         credentials = {"usernames": {}}
-        for index in range(len(emails)):
-            credentials["usernames"][usernames[index]] = {"name": emails[index],
-                                                          "password": passwords[index]}
+        for username in usernames:
+            credentials["usernames"][username] = {"name": users[username]["key"],
+                                                  "password": users[username]["password"]}
 
         if login(username, password, credentials):
             st.success(f"Bienvenido, {username}!")
