@@ -8,19 +8,10 @@ DETA_KEY = "e0qgr2zg4tq_mbZWcCg7iGCpWFBbCy3GGFjEYHdFmZYR"
 deta = Deta(DETA_KEY)
 # Realizamos la conexión a la DB
 db = deta.Base("NutribalanceUsers")
-class SessionState:
-    def __init__(self):
-        self.logged_in = False
-        self.username = ""
-
-# Obtener el estado de la sesión
-session_state = SessionState()
-
 # Tu función fetch_usuarios
 def fetch_usuarios():
     users = db.fetch()
-    user_dict = {user['username']: user for user in users.items}
-    return user_dict
+    return users.items
 def get_usernames_usuarios():
     """
     Recupera y devuelve una lista con los nombres de usuario de cada
@@ -33,6 +24,7 @@ def get_usernames_usuarios():
     users = fetch_usuarios()
     usernames = list(users.keys())
     return usernames
+
 # Tu función de inicio de sesión
 def login(username, password, credentials):
     """
@@ -52,31 +44,35 @@ def get_emails_usuarios():
     - list: Una lista que contiene las direcciones de correo electrónico de
     todos los usuarios registrados.
     """
-    # guardamos las claves (nombres de usuario) de los datos de la DB
+    # guardamos los datos de la DB en users
     users = fetch_usuarios()
     emails = list(users.keys())
     return emails
+
 # Tu función principal
 def main():
     st.title("Inicio de Sesión")
-
     # Formulario de inicio de sesión
     username = st.text_input("Usuario")
     password = st.text_input("Contraseña", type="password")
     if st.button("Iniciar Sesión"):
-        if username in usernames:
-            if login(username, password, credentials):
-                session_state.logged_in = True
-                session_state.username = username
-                st.success(f"Bienvenido, {username}!")
-                # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
-                st.write("Inicio de sesión exitoso")
-            else:
-                st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
+        # Se almacenan los datos necesarios de la DB
+        users = fetch_usuarios()
+        emails = get_emails_usuarios()
+        usernames = get_usernames_usuarios()
+        passwords = [users[username]["password"] for username in usernames]
+
+        # Se crea el diccionario credentials necesario para el
+        # funcionamiento del autenticador de cuentas
+        credentials = {"usernames": {}}
+        for index in range(len(emails)):
+            credentials["usernames"][usernames[index]] = {"name": emails[index],
+                                                          "password": passwords[index]}
+        if login(username, password, credentials):
+            st.success(f"Bienvenido, {username}!")
+            # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
+            st.write("Aquí va el contenido de tu aplicación.")
         else:
-            st.error("Usuario no encontrado. Por favor, regístrese.")
-    # Mostrar el botón de cerrar sesión si el usuario está autenticado
-    if session_state.logged_in:
-        if st.button("Cerrar Sesión"):
-            session_state.logged_in = False
-            st.write("Sesión cerrada con éxito")
+            st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
+if __name__ == "__main__":
+    main()
