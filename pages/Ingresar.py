@@ -1,5 +1,5 @@
 import streamlit as st
-import streamlit_authenticator as stauth
+from streamlit_set_page_config import set_page_config
 from datetime import datetime
 from deta import Deta
 
@@ -66,7 +66,15 @@ def get_emails_usuarios():
     emails = list(users.keys())
     return emails
 
-# Tu función principal
+# Establecer la configuración de la página con la extensión
+set_page_config(
+    page_title="Inicio de Sesión",
+    page_icon=":key:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# Función principal
 def main():
     st.title("Inicio de Sesión")
 
@@ -105,5 +113,6 @@ for username in usernames:
     credentials["usernames"][username] = {"name": all_users[username]["key"],
                                           "password": all_users[username]["password"]}
 
+# Ejecutar la función principal
 if __name__ == "__main__":
     main()
