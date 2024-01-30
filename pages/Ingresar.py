@@ -31,6 +31,15 @@ def login(username, password, users):
         return True
     return False
 
+# Función para obtener el token de sesión desde la base de datos
+def get_session_token(username):
+    session = db.get(username)
+    return session.get("session_id") if session else None
+
+# Función para guardar el token de sesión en la base de datos
+def save_session_token(username, session_id):
+    db.put({"key": username, "session_id": session_id})
+
 # Función principal
 def main():
     st.title("Inicio de Sesión")
@@ -46,11 +55,12 @@ def main():
     # Verificar credenciales al hacer clic en el botón
     if st.button("Iniciar Sesión"):
         if username in usernames and login(username, password, users):
-            # Configurar la cookie para mantener la sesión
-            session_id = f"{username}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
-            st.session_state.session_id = session_id
+            # Obtener el token de sesión existente o crear uno nuevo
+            session_id = get_session_token(username) or f"{username}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            # Guardar el token de sesión en la base de datos
+            save_session_token(username, session_id)
             st.success(f"Bienvenido, {username}!")
-            # Agrega el contenido de la aplicación después del inicio de sesión exitoso.
+            # Agregar el contenido de la aplicación después del inicio de sesión exitoso.
             st.write("Inicio de sesión exitoso")
         else:
             st.error("Credenciales incorrectas. Por favor, inténtalo de nuevo.")
