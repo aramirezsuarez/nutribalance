@@ -13,13 +13,14 @@ deta = Deta(DETA_KEY)
 db = deta.Base("NutribalanceUsers")
 
 class SessionState(object):
-    def __init__(self, **kwargs):
+    def __init__(self, logged_in=False, **kwargs):
+        self.logged_in = logged_in
         for key, val in kwargs.items():
             setattr(self, key, val)
 
 def get(**kwargs):
     if not hasattr(st, '_session_state'):
-        st._session_state = SessionState(**kwargs)
+        st._session_state = SessionState(logged_in=False, **kwargs)
     return st._session_state
 
 # Tu función fetch_usuarios
@@ -75,9 +76,8 @@ def main():
     # Formulario de inicio de sesión
     username = st.text_input("Usuario")
     password = st.text_input("Contraseña", type="password")
-    session_state = get(username="", password="")
-    session_state.username = username
-    session_state.password = password
+    
+    session_state = get(username=username, password=password, logged_in=False)
 
     if st.button("Iniciar Sesión"):
         if username in usernames:
